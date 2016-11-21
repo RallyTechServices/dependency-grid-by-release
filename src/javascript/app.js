@@ -65,7 +65,7 @@ Ext.define("TSApp", {
         var me = this;
 
         var model_name = 'HierarchicalRequirement',
-            field_names = ['ObjectID','FormattedID','Name','Project','ScheduleState','Release','Iteration','StartDate','EndDate','ReleaseDate','Predecessors','Successors','Owner','Blocked','BlockedReason','Notes'],
+            field_names = ['ObjectID','FormattedID','Name','Project','ScheduleState','Release','Iteration','StartDate','EndDate','ReleaseStartDate','ReleaseDate','Predecessors','Successors','Owner','Blocked','BlockedReason','Notes'],
             filters = [];
         var release_name = me.release.rawValue;
 
@@ -185,7 +185,7 @@ Ext.define("TSApp", {
         var deferred = Ext.create('Deft.Deferred');
         if(record.get('Successors').Count > 0){
             record.getCollection('Successors').load({
-                fetch: ['ObjectID','FormattedID','Name','Project','ScheduleState','Release','Iteration','StartDate','EndDate','ReleaseDate', 'Successors','Owner','Blocked','BlockedReason','Notes'],
+                fetch: ['ObjectID','FormattedID','Name','Project','ScheduleState','Release','Iteration','StartDate','EndDate','ReleaseStartDate','ReleaseDate', 'Successors','Owner','Blocked','BlockedReason','Notes'],
                 scope: me,
                 callback: function(records, operation, success) {
                     deferred.resolve(records);
@@ -193,7 +193,6 @@ Ext.define("TSApp", {
             });
         }else{
             deferred.resolve([]);                    
-
         }
         return deferred;
     },
@@ -203,7 +202,7 @@ Ext.define("TSApp", {
         var deferred = Ext.create('Deft.Deferred');
         if(record.get('Predecessors').Count > 0){
             record.getCollection('Predecessors').load({
-                fetch: ['ObjectID','FormattedID','Name','Project','ScheduleState','Release','Iteration','StartDate','EndDate','ReleaseDate', 'Successors','Owner','Blocked','BlockedReason','Notes'],
+                fetch: ['ObjectID','FormattedID','Name','Project','ScheduleState','Release','Iteration','StartDate','EndDate','ReleaseStartDate','ReleaseDate', 'Successors','Owner','Blocked','BlockedReason','Notes'],
                 scope: me,
                 callback: function(records, operation, success) {
                     deferred.resolve(records);
@@ -211,7 +210,6 @@ Ext.define("TSApp", {
             });
         }else{
             deferred.resolve([]);                    
-
         }
         return deferred;
     },
@@ -243,251 +241,387 @@ Ext.define("TSApp", {
         this.down('#display_box').removeAll();
 
         var grid = {
-            header: false,
             xtype: 'rallygrid',
             store: store,
             showRowActionsColumn: false,
-            features: [{
-                ftype: 'grouping',
-                showSummaryRow: true,
-                groupHeaderTpl: ' {name}'
-            }, {
-                ftype: 'summary'
-            }],            
             columnCfgs:[
                 {
-                    text: 'Give User Story ID', 
-                    dataIndex: 'Predecessor',
-                    //flex: 1,
-                    renderer:function(Predecessor){
-                        return  Predecessor ? Predecessor.get('FormattedID'):'...';
-                    }
+                    text: 'Give (Predecessors)',
+                    menuDisabled: false,
+                    columns: [
+                        {
+                            text: 'Give User Story ID', 
+                            dataIndex: 'Predecessor',
+                            //flex: 1,
+                            renderer:function(Predecessor,metaData){
+                                //metaData.style = 'background-color:grey';
+                                return  Predecessor ? Predecessor.get('FormattedID'):'...';
+                            },
+                            menuDisabled: false
+                        },
+                        {
+                            text: 'User Story Name', 
+                            dataIndex: 'Predecessor',
+                            //flex: 2,
+                            renderer:function(Predecessor){
+                                return  Predecessor ? Predecessor.get('Name'):'...';
+                            }
+                        },
+                        {
+                            text: 'Project Name', 
+                            dataIndex: 'Predecessor',
+                            //flex: 2,
+                            renderer:function(Predecessor){
+                                return Predecessor  && Predecessor.get('Project') ? Predecessor.get('Project').Name:'...';
+                            }
+                        },
+                        {
+                            text: 'Release Name', 
+                            dataIndex: 'Predecessor',
+                            //flex: 2,
+                            renderer:function(Predecessor){
+                                return  Predecessor && Predecessor.get('Release') ? Predecessor.get('Release').Name:'...';
+                            }
+                        },
+                        {
+                            text: 'Release Start Date', 
+                            dataIndex: 'Predecessor',
+                            //flex: 1,                    
+                            renderer:function(Predecessor){
+                                return Predecessor && Predecessor.get('Release') ? Ext.util.Format.date(Predecessor.get('Release').ReleaseStartDate):'...';
+                            }
+                        },
+                        {
+                            text: 'Release End Date', 
+                            dataIndex: 'Predecessor',
+                            //flex: 1,                    
+                            renderer:function(Predecessor){
+                                return Predecessor && Predecessor.get('Release') ? Ext.util.Format.date(Predecessor.get('Release').ReleaseDate):'...';
+                            }
+                        },
+                        {
+                            text: 'Iteration Name', 
+                            dataIndex: 'Predecessor',
+                            //flex: 2,                    
+                            renderer:function(Predecessor){
+                                return Predecessor && Predecessor.get('Iteration') ? Predecessor.get('Iteration').Name:'...';
+                            }
+                        },
+                        {
+                            text: 'Iteration Start Date', 
+                            dataIndex: 'Predecessor',
+                            //flex: 1,                    
+                            renderer:function(Predecessor){
+                                return Predecessor && Predecessor.get('Iteration') ? Ext.util.Format.date(Predecessor.get('Iteration').StartDate): '...';
+                            }
+                        },
+                        {
+                            text: 'Iteration End Date', 
+                            dataIndex: 'Predecessor',
+                            //flex: 1,                    
+                            renderer:function(Predecessor){
+                                return Predecessor && Predecessor.get('Iteration') ? Ext.util.Format.date(Predecessor.get('Iteration').EndDate) : '...';
+                            }
+                        },
+                        {
+                            text: 'Schedule State', 
+                            dataIndex: 'Predecessor',
+                            //flex: 1,                    
+                            renderer:function(Predecessor){
+                                return  Predecessor ? Predecessor.get('ScheduleState'):'...';
+                            }
+                        },
+                        {
+                            text: 'Owner', 
+                            dataIndex: 'Predecessor',
+                            //flex: 1,                    
+                            renderer:function(Predecessor){
+                                return Predecessor && Predecessor.get('Owner') ? Predecessor.get('Owner').Name : '...';
+                            }
+                        },
+                        {
+                            text: 'Blocked', 
+                            dataIndex: 'Predecessor',
+                            //flex: 1,                    
+                            renderer:function(Predecessor){
+                                return  Predecessor ? Predecessor.get('Blocked') : '...';
+                            }
+                        },
+                        {
+                            text: 'Blocked Reason', 
+                            dataIndex: 'Predecessor',
+                            //flex: 1,                    
+                            renderer:function(Predecessor){
+                                return  Predecessor ? Predecessor.get('BlockedReason'):'...';
+                            }
+                        },
+                        {
+                            text: 'Notes', 
+                            dataIndex: 'Predecessor',
+                            //flex: 2,                    
+                            renderer:function(Predecessor){
+                                return  Predecessor ? Predecessor.get('Notes'):'...';
+                            }
+                        }
+                    ],
+                    draggable: false, 
+                    hideable: false,
+                    sortable: false,
+                    border:5,
+                    style: {
+                        backgroundColor: '#cccccc'
+                    }                    
                 },
                 {
-                    text: 'User Story Name', 
-                    dataIndex: 'Predecessor',
-                    //flex: 2,
-                    renderer:function(Predecessor){
-                        return  Predecessor ? Predecessor.get('Name'):'...';
-                    }
-                },
-                {
-                    text: 'Project Name', 
-                    dataIndex: 'Predecessor',
-                    //flex: 2,
-                    renderer:function(Predecessor){
-                        return Predecessor  && Predecessor.get('Project') ? Predecessor.get('Project').Name:'...';
-                    }
-                },
-                {
-                    text: 'Release Name', 
-                    dataIndex: 'Predecessor',
-                    //flex: 2,
-                    renderer:function(Predecessor){
-                        return  Predecessor && Predecessor.get('Release') ? Predecessor.get('Release').Name:'...';
-                    }
-                },
-                {
-                    text: 'Release Start Date', 
-                    dataIndex: 'Predecessor',
-                    //flex: 1,                    
-                    renderer:function(Predecessor){
-                        return Predecessor && Predecessor.get('Release') ? Predecessor.get('Release').ReleaseStartDate:'...';
-                    }
-                },
-                {
-                    text: 'Release End Date', 
-                    dataIndex: 'Predecessor',
-                    //flex: 1,                    
-                    renderer:function(Predecessor){
-                        return Predecessor && Predecessor.get('Release') ? Predecessor.get('Release').ReleaseDate:'...';
-                    }
-                },
-                {
-                    text: 'Iteration Name', 
-                    dataIndex: 'Predecessor',
-                    //flex: 2,                    
-                    renderer:function(Predecessor){
-                        return Predecessor && Predecessor.get('Iteration') ? Predecessor.get('Iteration').Name:'...';
-                    }
-                },
-                {
-                    text: 'Iteration Start Date', 
-                    dataIndex: 'Predecessor',
-                    //flex: 1,                    
-                    renderer:function(Predecessor){
-                        return Predecessor && Predecessor.get('Iteration') ? Predecessor.get('Iteration').StartDate: '...';
-                    }
-                },
-                {
-                    text: 'Iteration End Date', 
-                    dataIndex: 'Predecessor',
-                    //flex: 1,                    
-                    renderer:function(Predecessor){
-                        return Predecessor && Predecessor.get('Iteration') ? Predecessor.get('Iteration').EndDate : '...';
-                    }
-                },
-                {
-                    text: 'Schedule State', 
-                    dataIndex: 'Predecessor',
-                    //flex: 1,                    
-                    renderer:function(Predecessor){
-                        return  Predecessor ? Predecessor.get('ScheduleState'):'...';
-                    }
-                },
-                {
-                    text: 'Owner', 
-                    dataIndex: 'Predecessor',
-                    //flex: 1,                    
-                    renderer:function(Predecessor){
-                        return Predecessor && Predecessor.get('Owner') ? Predecessor.get('Owner').Name : '...';
-                    }
-                },
-                {
-                    text: 'Blocked', 
-                    dataIndex: 'Predecessor',
-                    //flex: 1,                    
-                    renderer:function(Predecessor){
-                        return  Predecessor ? Predecessor.get('Blocked') : '...';
-                    }
-                },
-                {
-                    text: 'Blocked Reason', 
-                    dataIndex: 'Predecessor',
-                    //flex: 1,                    
-                    renderer:function(Predecessor){
-                        return  Predecessor ? Predecessor.get('BlockedReason'):'...';
-                    }
-                },
-                {
-                    text: 'Notes', 
-                    dataIndex: 'Predecessor',
-                    //flex: 2,                    
-                    renderer:function(Predecessor){
-                        return  Predecessor ? Predecessor.get('Notes'):'...';
-                    }
-                },
-                {
-                    text: 'FormattedID', 
-                    dataIndex: 'Story',
-                    //flex: 1,
-                    renderer:function(Story){
-                        return Story.get('FormattedID');
-                    }
-                },
+                    text: 'Stories',
+                    columns: [
+                        {
+                            text: 'Story User ID', 
+                            dataIndex: 'Story',
+                            //flex: 1,
+                            renderer:function(Story){
+                                return Story ? Story.get('FormattedID'):'...';
+                            }
+                        },
+                        {
+                            text: 'User Story Name', 
+                            dataIndex: 'Story',
+                            //flex: 2,
+                            renderer:function(Story){
+                                return Story ? Story.get('Name') :'...';
+                            }
+                        },
+                        {
+                            text: 'Project Name', 
+                            dataIndex: 'Story',
+                            //flex: 2,
+                            renderer:function(Story){
+                                return Story && Story.get('Project') ? Story.get('Project').Name : '...';
+                            }
+                        },
+                        {
+                            text: 'Release Name', 
+                            dataIndex: 'Story',
+                            //flex: 2,
+                            renderer:function(Story){
+                                return Story && Story.get('Release') ? Story.get('Release').Name : '...';
+                            }
+                        },
+                        {
+                            text: 'Release Start Date', 
+                            dataIndex: 'Story',
+                            //flex: 1,                    
+                            renderer:function(Story){
+                                return Story && Story.get('Release') ? Ext.util.Format.date(Story.get('Release').ReleaseStartDate) : '...';
+                            }
+                        },
+                        {
+                            text: 'Release End Date', 
+                            dataIndex: 'Story',
+                            //flex: 1,                    
+                            renderer:function(Story){
+                                return Story && Story.get('Release') ?  Ext.util.Format.date(Story.get('Release').ReleaseDate) : '...';
+                            }
+                        },
+                        {
+                            text: 'Iteration Name', 
+                            dataIndex: 'Story',
+                            //flex: 2,                    
+                            renderer:function(Story){
+                                return Story && Story.get('Iteration') ? Story.get('Iteration').Name : '...';
+                            }
+                        },
+                        {
+                            text: 'Iteration Start Date', 
+                            dataIndex: 'Story',
+                            //flex: 1,                    
+                            renderer:function(Story){
+                                return Story && Story.get('Iteration') ? Ext.util.Format.date(Story.get('Iteration').StartDate) : '...';
+                            }
+                        },
+                        {
+                            text: 'Iteration End Date', 
+                            dataIndex: 'Story',
+                            //flex: 1,                    
+                            renderer:function(Story){
+                                return Story && Story.get('Iteration') ? Ext.util.Format.date(Story.get('Iteration').EndDate) : '...';
+                            }
+                        },
+                        {
+                            text: 'Schedule State', 
+                            dataIndex: 'Story',
+                            //flex: 1,                    
+                            renderer:function(Story){
+                                return Story ? Story.get('ScheduleState'):'...';
+                            }
+                        },
+                        {
+                            text: 'Owner', 
+                            dataIndex: 'Story',
+                            //flex: 1,                    
+                            renderer:function(Story){
+                                return Story && Story.get('Owner') ? Story.get('Owner').Name : '...'
+                            }
+                        },
+                        {
+                            text: 'Blocked', 
+                            dataIndex: 'Story',
+                            //flex: 1,                    
+                            renderer:function(Story){
+                                return Story ? Story.get('Blocked'):'...';
+                            }
+                        },
+                        {
+                            text: 'Blocked Reason', 
+                            dataIndex: 'Story',
+                            //flex: 1,                    
+                            renderer:function(Story){
+                                return Story ? Story.get('BlockedReason'):'...';
+                            }
+                        },
+                        {
+                            text: 'Notes', 
+                            dataIndex: 'Story',
+                            //flex: 2,                    
+                            renderer:function(Story){
+                                return Story ? Story.get('Notes'):'...';
+                            }
+                        }
+                    ],
+                    draggable: false, 
+                    hideable: false,
+                    sortable: false,
+                    border:5,
+                    style: {
+                        backgroundColor: '#cccccc'
+                    }     
 
+                },                
                 {
-                    text: 'Get User ID', 
-                    dataIndex: 'Successor',
-                    //flex: 1,
-                    renderer:function(Successor){
-                        return Successor ? Successor.get('FormattedID'):'...';
-                    }
-                },
-                {
-                    text: 'User Story Name', 
-                    dataIndex: 'Successor',
-                    //flex: 2,
-                    renderer:function(Successor){
-                        return Successor ? Successor.get('Name') :'...';
-                    }
-                },
-                {
-                    text: 'Project Name', 
-                    dataIndex: 'Successor',
-                    //flex: 2,
-                    renderer:function(Successor){
-                        return Successor && Successor.get('Project') ? Successor.get('Project').Name : '...';
-                    }
-                },
-                {
-                    text: 'Release Name', 
-                    dataIndex: 'Successor',
-                    //flex: 2,
-                    renderer:function(Successor){
-                        return Successor && Successor.get('Release') ? Successor.get('Release').Name : '...';
-                    }
-                },
-                {
-                    text: 'Release Start Date', 
-                    dataIndex: 'Successor',
-                    //flex: 1,                    
-                    renderer:function(Successor){
-                        return Successor && Successor.get('Release') ? Successor.get('Release').ReleaseStartDate : '...';
-                    }
-                },
-                {
-                    text: 'Release End Date', 
-                    dataIndex: 'Successor',
-                    //flex: 1,                    
-                    renderer:function(Successor){
-                        return Successor && Successor.get('Release') ?  Successor.get('Release').ReleaseDate : '...';
-                    }
-                },
-                {
-                    text: 'Iteration Name', 
-                    dataIndex: 'Successor',
-                    //flex: 2,                    
-                    renderer:function(Successor){
-                        return Successor && Successor.get('Iteration') ? Successor.get('Iteration').Name : '...';
-                    }
-                },
-                {
-                    text: 'Iteration Start Date', 
-                    dataIndex: 'Successor',
-                    //flex: 1,                    
-                    renderer:function(Successor){
-                        return Successor && Successor.get('Iteration') ? Successor.get('Iteration').StartDate : '...';
-                    }
-                },
-                {
-                    text: 'Iteration End Date', 
-                    dataIndex: 'Successor',
-                    //flex: 1,                    
-                    renderer:function(Successor){
-                        return Successor && Successor.get('Iteration') ? Successor.get('Iteration').EndDate : '...';
-                    }
-                },
-                {
-                    text: 'Schedule State', 
-                    dataIndex: 'Successor',
-                    //flex: 1,                    
-                    renderer:function(Successor){
-                        return Successor ? Successor.get('ScheduleState'):'...';
-                    }
-                },
-                {
-                    text: 'Owner', 
-                    dataIndex: 'Successor',
-                    //flex: 1,                    
-                    renderer:function(Successor){
-                        return Successor && Successor.get('Owner') ? Successor.get('Owner').Name : '...'
-                    }
-                },
-                {
-                    text: 'Blocked', 
-                    dataIndex: 'Successor',
-                    //flex: 1,                    
-                    renderer:function(Successor){
-                        return Successor ? Successor.get('Blocked'):'...';
-                    }
-                },
-                {
-                    text: 'Blocked Reason', 
-                    dataIndex: 'Successor',
-                    //flex: 1,                    
-                    renderer:function(Successor){
-                        return Successor ? Successor.get('BlockedReason'):'...';
-                    }
-                },
-                {
-                    text: 'Notes', 
-                    dataIndex: 'Successor',
-                    //flex: 2,                    
-                    renderer:function(Successor){
-                        return Successor ? Successor.get('Notes'):'...';
-                    }
-                }]
+                    text: 'Get (Successors)',
+                    columns: [
+                        {
+                            text: 'Get User ID', 
+                            dataIndex: 'Successor',
+                            //flex: 1,
+                            renderer:function(Successor){
+                                return Successor ? Successor.get('FormattedID'):'...';
+                            }
+                        },
+                        {
+                            text: 'User Story Name', 
+                            dataIndex: 'Successor',
+                            //flex: 2,
+                            renderer:function(Successor){
+                                return Successor ? Successor.get('Name') :'...';
+                            }
+                        },
+                        {
+                            text: 'Project Name', 
+                            dataIndex: 'Successor',
+                            //flex: 2,
+                            renderer:function(Successor){
+                                return Successor && Successor.get('Project') ? Successor.get('Project').Name : '...';
+                            }
+                        },
+                        {
+                            text: 'Release Name', 
+                            dataIndex: 'Successor',
+                            //flex: 2,
+                            renderer:function(Successor){
+                                return Successor && Successor.get('Release') ? Successor.get('Release').Name : '...';
+                            }
+                        },
+                        {
+                            text: 'Release Start Date', 
+                            dataIndex: 'Successor',
+                            //flex: 1,                    
+                            renderer:function(Successor){
+                                return Successor && Successor.get('Release') ? Ext.util.Format.date(Successor.get('Release').ReleaseStartDate) : '...';
+                            }
+                        },
+                        {
+                            text: 'Release End Date', 
+                            dataIndex: 'Successor',
+                            //flex: 1,                    
+                            renderer:function(Successor){
+                                return Successor && Successor.get('Release') ?  Ext.util.Format.date(Successor.get('Release').ReleaseDate) : '...';
+                            }
+                        },
+                        {
+                            text: 'Iteration Name', 
+                            dataIndex: 'Successor',
+                            //flex: 2,                    
+                            renderer:function(Successor){
+                                return Successor && Successor.get('Iteration') ? Successor.get('Iteration').Name : '...';
+                            }
+                        },
+                        {
+                            text: 'Iteration Start Date', 
+                            dataIndex: 'Successor',
+                            //flex: 1,                    
+                            renderer:function(Successor){
+                                return Successor && Successor.get('Iteration') ? Ext.util.Format.date(Successor.get('Iteration').StartDate) : '...';
+                            }
+                        },
+                        {
+                            text: 'Iteration End Date', 
+                            dataIndex: 'Successor',
+                            //flex: 1,                    
+                            renderer:function(Successor){
+                                return Successor && Successor.get('Iteration') ? Ext.util.Format.date(Successor.get('Iteration').EndDate) : '...';
+                            }
+                        },
+                        {
+                            text: 'Schedule State', 
+                            dataIndex: 'Successor',
+                            //flex: 1,                    
+                            renderer:function(Successor){
+                                return Successor ? Successor.get('ScheduleState'):'...';
+                            }
+                        },
+                        {
+                            text: 'Owner', 
+                            dataIndex: 'Successor',
+                            //flex: 1,                    
+                            renderer:function(Successor){
+                                return Successor && Successor.get('Owner') ? Successor.get('Owner').Name : '...'
+                            }
+                        },
+                        {
+                            text: 'Blocked', 
+                            dataIndex: 'Successor',
+                            //flex: 1,                    
+                            renderer:function(Successor){
+                                return Successor ? Successor.get('Blocked'):'...';
+                            }
+                        },
+                        {
+                            text: 'Blocked Reason', 
+                            dataIndex: 'Successor',
+                            //flex: 1,                    
+                            renderer:function(Successor){
+                                return Successor ? Successor.get('BlockedReason'):'...';
+                            }
+                        },
+                        {
+                            text: 'Notes', 
+                            dataIndex: 'Successor',
+                            //flex: 2,                    
+                            renderer:function(Successor){
+                                return Successor ? Successor.get('Notes'):'...';
+                            }
+                        }
+                    ],
+                    draggable: false, 
+                    hideable: false,
+                    sortable: false,
+                    border:5,
+                    style: {
+                        backgroundColor: '#cccccc'
+                    }                         
+                }
+                ]
         };
 
         this.down('#display_box').add(grid);
