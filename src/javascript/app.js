@@ -11,7 +11,26 @@ Ext.define("TSApp", {
     integrationHeaders : {
         name : "TSApp"
     },
-                        
+
+    config: {
+        defaultSettings: {
+            showMoreColumns: true
+        }
+    },
+
+    getSettingsFields: function() {
+        var me = this;
+        return [{
+            name: 'showMoreColumns',
+            itemId: 'showMoreColumns',
+            xtype: 'rallycheckboxfield',
+            boxLabelAlign: 'after',
+            fieldLabel: '',
+            margin:10,
+            boxLabel: 'Show More Columns on Grid',
+            checked: true
+        }];
+    },
      
     launch: function() {
         var me = this;
@@ -238,147 +257,52 @@ Ext.define("TSApp", {
     },
     
     _displayGrid: function(store){
-        this.down('#display_box').removeAll();
+        var me = this;
+        me.down('#display_box').removeAll();
 
         var grid = {
             xtype: 'rallygrid',
             store: store,
             showRowActionsColumn: false,
-            columnCfgs:[
-                {
-                    text: 'Give (Predecessors)',
-                    menuDisabled: false,
-                    columns: [
-                        {
-                            text: 'Give User Story ID', 
-                            dataIndex: 'Predecessor',
-                            //flex: 1,
-                            renderer:function(Predecessor,metaData){
-                                //metaData.style = 'background-color:grey';
-                                return  Predecessor ? Predecessor.get('FormattedID'):'...';
-                            },
-                            menuDisabled: false
-                        },
-                        {
-                            text: 'User Story Name', 
-                            dataIndex: 'Predecessor',
-                            //flex: 2,
-                            renderer:function(Predecessor){
-                                return  Predecessor ? Predecessor.get('Name'):'...';
-                            }
-                        },
-                        {
-                            text: 'Project Name', 
-                            dataIndex: 'Predecessor',
-                            //flex: 2,
-                            renderer:function(Predecessor){
-                                return Predecessor  && Predecessor.get('Project') ? Predecessor.get('Project').Name:'...';
-                            }
-                        },
-                        {
-                            text: 'Release Name', 
-                            dataIndex: 'Predecessor',
-                            //flex: 2,
-                            renderer:function(Predecessor){
-                                return  Predecessor && Predecessor.get('Release') ? Predecessor.get('Release').Name:'...';
-                            }
-                        },
-                        {
-                            text: 'Release Start Date', 
-                            dataIndex: 'Predecessor',
-                            //flex: 1,                    
-                            renderer:function(Predecessor){
-                                return Predecessor && Predecessor.get('Release') ? Ext.util.Format.date(Predecessor.get('Release').ReleaseStartDate):'...';
-                            }
-                        },
-                        {
-                            text: 'Release End Date', 
-                            dataIndex: 'Predecessor',
-                            //flex: 1,                    
-                            renderer:function(Predecessor){
-                                return Predecessor && Predecessor.get('Release') ? Ext.util.Format.date(Predecessor.get('Release').ReleaseDate):'...';
-                            }
-                        },
-                        {
-                            text: 'Iteration Name', 
-                            dataIndex: 'Predecessor',
-                            //flex: 2,                    
-                            renderer:function(Predecessor){
-                                return Predecessor && Predecessor.get('Iteration') ? Predecessor.get('Iteration').Name:'...';
-                            }
-                        },
-                        {
-                            text: 'Iteration Start Date', 
-                            dataIndex: 'Predecessor',
-                            //flex: 1,                    
-                            renderer:function(Predecessor){
-                                return Predecessor && Predecessor.get('Iteration') ? Ext.util.Format.date(Predecessor.get('Iteration').StartDate): '...';
-                            }
-                        },
-                        {
-                            text: 'Iteration End Date', 
-                            dataIndex: 'Predecessor',
-                            //flex: 1,                    
-                            renderer:function(Predecessor){
-                                return Predecessor && Predecessor.get('Iteration') ? Ext.util.Format.date(Predecessor.get('Iteration').EndDate) : '...';
-                            }
-                        },
-                        {
-                            text: 'Schedule State', 
-                            dataIndex: 'Predecessor',
-                            //flex: 1,                    
-                            renderer:function(Predecessor){
-                                return  Predecessor ? Predecessor.get('ScheduleState'):'...';
-                            }
-                        },
-                        {
-                            text: 'Owner', 
-                            dataIndex: 'Predecessor',
-                            //flex: 1,                    
-                            renderer:function(Predecessor){
-                                return Predecessor && Predecessor.get('Owner') ? Predecessor.get('Owner').Name : '...';
-                            }
-                        },
-                        {
-                            text: 'Blocked', 
-                            dataIndex: 'Predecessor',
-                            //flex: 1,                    
-                            renderer:function(Predecessor){
-                                return  Predecessor ? Predecessor.get('Blocked') : '...';
-                            }
-                        },
-                        {
-                            text: 'Blocked Reason', 
-                            dataIndex: 'Predecessor',
-                            //flex: 1,                    
-                            renderer:function(Predecessor){
-                                return  Predecessor ? Predecessor.get('BlockedReason'):'...';
-                            }
-                        },
-                        {
-                            text: 'Notes', 
-                            dataIndex: 'Predecessor',
-                            //flex: 2,                    
-                            renderer:function(Predecessor){
-                                return  Predecessor ? Predecessor.get('Notes'):'...';
-                            }
-                        }
-                    ],
-                    draggable: false, 
-                    hideable: false,
-                    sortable: false,
-                    border:5,
-                    style: {
-                        backgroundColor: '#cccccc'
-                    }                    
-                },
-                {
-                    text: 'Stories',
-                    columns: [
-                        {
+            columnCfgs:me._getColumns()
+        };
+
+        me.down('#display_box').add(grid);
+
+    },
+
+    _getColumns: function(){
+
+    var me = this;
+    var pre_columns = [];
+
+    pre_columns.push(
+        { text: 'Give User Story ID',  flex: 1, dataIndex: 'Predecessor',                            renderer:function(Predecessor,metaData){     return  Predecessor ? Predecessor.get('FormattedID'):'...'; }},
+        { text: 'User Story Name',  flex: 2, dataIndex: 'Predecessor', renderer:function(Predecessor){     return  Predecessor ? Predecessor.get('Name'):'...'; }},
+        { text: 'Project Name',  flex: 1, dataIndex: 'Predecessor', renderer:function(Predecessor){     return Predecessor  && Predecessor.get('Project') ? Predecessor.get('Project').Name:'...'; }},
+        { text: 'Schedule State',  flex: 1, dataIndex: 'Predecessor', renderer:function(Predecessor){     return  Predecessor ? Predecessor.get('ScheduleState'):'...'; }}
+    );    
+
+    if(me.getSetting('showMoreColumns')){
+        pre_columns.push(
+            {text: 'Release Name', dataIndex: 'Predecessor', renderer:function(Predecessor){    return  Predecessor && Predecessor.get('Release') ? Predecessor.get('Release').Name:'...';}},
+            {text: 'Release Start Date', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Release') ? Ext.util.Format.date(Predecessor.get('Release').ReleaseStartDate):'...';}},
+            {text: 'Release End Date', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Release') ? Ext.util.Format.date(Predecessor.get('Release').ReleaseDate):'...';}},
+            {text: 'Iteration Name', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Iteration') ? Predecessor.get('Iteration').Name:'...';}},
+            {text: 'Iteration Start Date', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Iteration') ? Ext.util.Format.date(Predecessor.get('Iteration').StartDate): '...';}},
+            {text: 'Iteration End Date', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Iteration') ? Ext.util.Format.date(Predecessor.get('Iteration').EndDate) : '...';}},
+            {text: 'Owner', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Owner') ? Predecessor.get('Owner').Name : '...';}},
+            {text: 'Blocked', dataIndex: 'Predecessor',renderer:function(Predecessor){    return  Predecessor ? Predecessor.get('Blocked') : '...';}},
+            {text: 'Blocked Reason', dataIndex: 'Predecessor',renderer:function(Predecessor){    return  Predecessor ? Predecessor.get('BlockedReason'):'...';}},
+            {text: 'Notes', dataIndex: 'Predecessor', renderer:function(Predecessor){    return  Predecessor ? Predecessor.get('Notes'):'...';}}        
+        );        
+    }
+
+    var story_columns = [];
+
+    story_columns.push({
                             text: 'Story User ID', 
-                            dataIndex: 'Story',
-                            //flex: 1,
+                            dataIndex: 'Story',flex: 1, 
                             renderer:function(Story){
                                 return Story ? Story.get('FormattedID'):'...';
                             }
@@ -386,20 +310,31 @@ Ext.define("TSApp", {
                         {
                             text: 'User Story Name', 
                             dataIndex: 'Story',
-                            //flex: 2,
+                            flex: 2,
                             renderer:function(Story){
                                 return Story ? Story.get('Name') :'...';
                             }
                         },
                         {
                             text: 'Project Name', 
-                            dataIndex: 'Story',
+                            dataIndex: 'Story',flex: 1, 
                             //flex: 2,
                             renderer:function(Story){
                                 return Story && Story.get('Project') ? Story.get('Project').Name : '...';
                             }
                         },
                         {
+                            text: 'Schedule State', 
+                            dataIndex: 'Story',flex: 1, 
+                            //flex: 1,                    
+                            renderer:function(Story){
+                                return Story ? Story.get('ScheduleState'):'...';
+                            }
+                        });
+
+    if(me.getSetting('showMoreColumns')){
+
+        story_columns.push({
                             text: 'Release Name', 
                             dataIndex: 'Story',
                             //flex: 2,
@@ -448,14 +383,6 @@ Ext.define("TSApp", {
                             }
                         },
                         {
-                            text: 'Schedule State', 
-                            dataIndex: 'Story',
-                            //flex: 1,                    
-                            renderer:function(Story){
-                                return Story ? Story.get('ScheduleState'):'...';
-                            }
-                        },
-                        {
                             text: 'Owner', 
                             dataIndex: 'Story',
                             //flex: 1,                    
@@ -486,45 +413,45 @@ Ext.define("TSApp", {
                             renderer:function(Story){
                                 return Story ? Story.get('Notes'):'...';
                             }
-                        }
-                    ],
-                    draggable: false, 
-                    hideable: false,
-                    sortable: false,
-                    border:5,
-                    style: {
-                        backgroundColor: '#cccccc'
-                    }     
+                        });
+    }
 
-                },                
-                {
-                    text: 'Get (Successors)',
-                    columns: [
-                        {
+    var succ_columns = [];
+
+    succ_columns.push({
                             text: 'Get User ID', 
-                            dataIndex: 'Successor',
-                            //flex: 1,
+                            dataIndex: 'Successor',flex: 1, 
                             renderer:function(Successor){
                                 return Successor ? Successor.get('FormattedID'):'...';
                             }
                         },
                         {
                             text: 'User Story Name', 
-                            dataIndex: 'Successor',
-                            //flex: 2,
+                            dataIndex: 'Successor',flex: 1, 
+                            flex: 2,
                             renderer:function(Successor){
                                 return Successor ? Successor.get('Name') :'...';
                             }
                         },
                         {
                             text: 'Project Name', 
-                            dataIndex: 'Successor',
+                            dataIndex: 'Successor',flex: 1, 
                             //flex: 2,
                             renderer:function(Successor){
                                 return Successor && Successor.get('Project') ? Successor.get('Project').Name : '...';
                             }
                         },
                         {
+                            text: 'Schedule State', 
+                            dataIndex: 'Successor',flex: 1, 
+                            //flex: 1,                    
+                            renderer:function(Successor){
+                                return Successor ? Successor.get('ScheduleState'):'...';
+                            }
+                        });
+
+    if(me.getSetting('showMoreColumns')){
+            succ_columns.push({
                             text: 'Release Name', 
                             dataIndex: 'Successor',
                             //flex: 2,
@@ -573,14 +500,6 @@ Ext.define("TSApp", {
                             }
                         },
                         {
-                            text: 'Schedule State', 
-                            dataIndex: 'Successor',
-                            //flex: 1,                    
-                            renderer:function(Successor){
-                                return Successor ? Successor.get('ScheduleState'):'...';
-                            }
-                        },
-                        {
                             text: 'Owner', 
                             dataIndex: 'Successor',
                             //flex: 1,                    
@@ -611,8 +530,37 @@ Ext.define("TSApp", {
                             renderer:function(Successor){
                                 return Successor ? Successor.get('Notes'):'...';
                             }
-                        }
-                    ],
+                        });
+    }
+
+    return [
+                {
+                    text: 'Give (Predecessors)',
+                    menuDisabled: false,
+                    columns: pre_columns,
+                    draggable: false, 
+                    hideable: false,
+                    sortable: false,
+                    border:5,
+                    style: {
+                        backgroundColor: '#cccccc'
+                    }                    
+                },
+                {
+                    text: 'Stories',
+                    columns: story_columns,
+                    draggable: false, 
+                    hideable: false,
+                    sortable: false,
+                    border:5,
+                    style: {
+                        backgroundColor: '#cccccc'
+                    }     
+
+                },                
+                {
+                    text: 'Get (Successors)',
+                    columns: succ_columns,
                     draggable: false, 
                     hideable: false,
                     sortable: false,
@@ -621,10 +569,7 @@ Ext.define("TSApp", {
                         backgroundColor: '#cccccc'
                     }                         
                 }
-                ]
-        };
-
-        this.down('#display_box').add(grid);
+                ];
 
     },
 
