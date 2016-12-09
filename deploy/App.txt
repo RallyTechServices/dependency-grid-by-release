@@ -3,13 +3,13 @@
 <head>
     <title>Dependency Grid by Release</title>
     <!--  (c) 2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Wed Nov 23 2016 11:53:54 GMT-0800 (PST) -->
+    <!--  Build Date: Fri Dec 09 2016 06:55:13 GMT-0800 (PST) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Wed Nov 23 2016 11:53:54 GMT-0800 (PST)";
+        var APP_BUILD_DATE = "Fri Dec 09 2016 06:55:13 GMT-0800 (PST)";
         var STORY    = "US801";
         var BUILDER  = "arajaraman";
-        var CHECKSUM = 47065600740;
+        var CHECKSUM = 45067477268;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -840,25 +840,25 @@ Ext.define("TSApp", {
         name : "TSApp"
     },
 
-    config: {
-        defaultSettings: {
-            showMoreColumns: true
-        }
-    },
+    // config: {
+    //     defaultSettings: {
+    //         showMoreColumns: false
+    //     }
+    // },
 
-    getSettingsFields: function() {
-        var me = this;
-        return [{
-            name: 'showMoreColumns',
-            itemId: 'showMoreColumns',
-            xtype: 'rallycheckboxfield',
-            boxLabelAlign: 'after',
-            fieldLabel: '',
-            margin:10,
-            boxLabel: 'Show More Columns on Grid',
-            checked: true
-        }];
-    },
+    // getSettingsFields: function() {
+    //     var me = this;
+    //     return [{
+    //         name: 'showMoreColumns',
+    //         itemId: 'showMoreColumns',
+    //         xtype: 'rallycheckboxfield',
+    //         boxLabelAlign: 'after',
+    //         fieldLabel: '',
+    //         margin:10,
+    //         boxLabel: 'Show More Columns on Grid',
+    //         checked: true
+    //     }];
+    // },
      
     launch: function() {
         var me = this;
@@ -883,12 +883,30 @@ Ext.define("TSApp", {
                 change: function(rcb) {
                     me.release = rcb;
                     me._queryAndDisplayGrid();
-
                 }
             }
         });
 
-         selector_box.add({
+        selector_box.add({
+            name: 'showMoreColumns',
+            itemId: 'showMoreColumns',
+            xtype: 'rallycheckboxfield',
+            boxLabelAlign: 'after',
+            fieldLabel: '',
+            margin:10,
+            boxLabel: 'Show More Columns on Grid',
+            checked: true,
+            listeners: {
+                scope: me,
+                change: function() {
+                    //me.release = rcb;
+                    me._queryAndDisplayGrid();
+                    //me.down('rallygrid').refresh();
+                }
+            }            
+        });
+        
+        selector_box.add({
             xtype:'rallybutton',
             itemId:'export_button',
             text: 'Download CSV',
@@ -912,7 +930,7 @@ Ext.define("TSApp", {
         var me = this;
 
         var model_name = 'HierarchicalRequirement',
-            field_names = ['ObjectID','FormattedID','Name','Project','ScheduleState','Release','Iteration','StartDate','EndDate','ReleaseStartDate','ReleaseDate','Predecessors','Successors','Owner','Blocked','BlockedReason','Notes'],
+            field_names = ['ObjectID','FormattedID','Name','Project','ScheduleState','Release','Iteration','StartDate','EndDate','ReleaseStartDate','ReleaseDate','Predecessors','Successors','Owner','Blocked','BlockedReason','Notes','Feature'],
             filters = [];
         var release_name = me.release.rawValue;
 
@@ -957,21 +975,39 @@ Ext.define("TSApp", {
                                     for (var j = 0; j < results[i][0].length || j < results[i][1].length; j++) {
                                         var pre = j < results[i][0].length ? results[i][0][j]:null;
                                         var suc = j < results[i][1].length ? results[i][1][j]:null;
+                                        console.log('pre,suc',pre,suc);
                                         
                                         //remove duplicates
                                         var storyRelOID = records[i] && records[i].get('Release') && records[i].get('Release').ObjectID ? records[i].get('Release').ObjectID : null;
                                         var preRelOID = pre && pre.get('Release') && pre.get('Release').ObjectID ? pre.get('Release').ObjectID : null;
+                                        //var sucRelOID = suc && suc.get('Release') && suc.get('Release').ObjectID ? suc.get('Release').ObjectID : null;
                                         if(storyRelOID == preRelOID){
                                             pre = null;
                                         }
-
+                                        // if(storyRelOID == sucRelOID){
+                                        //     suc = null;
+                                        // }
                                         if(pre != null || suc != null){
-                                            var us_dep = {
-                                                Story:records[i],
-                                                Predecessor: pre, 
-                                                Successor: suc
-                                            };
-                                            us_deps.push(us_dep);                                                
+                                            // var us_dep = {
+                                            //     Story:records[i],
+                                            //     Predecessor: pre, 
+                                            //     Successor: suc
+                                            // };
+                                            // us_deps.push(us_dep);
+                                            if(pre != null){
+                                                var us_dep = {
+                                                    Predecessor: pre, 
+                                                    Successor:records[i]
+                                                };
+                                                us_deps.push(us_dep);   
+                                            }                                            
+                                            if(suc != null){
+                                                var us_dep = {
+                                                    Predecessor:records[i],
+                                                    Successor: suc
+                                                };   
+                                                us_deps.push(us_dep);
+                                            }
                                         }
                                     }
                                 }
@@ -1108,141 +1144,26 @@ Ext.define("TSApp", {
         { text: 'Give User Story ID',  flex: 1, dataIndex: 'Predecessor',                            renderer:function(Predecessor,metaData){     return  Predecessor ? Predecessor.get('FormattedID'):'...'; }},
         { text: 'User Story Name',  flex: 2, dataIndex: 'Predecessor', renderer:function(Predecessor){     return  Predecessor ? Predecessor.get('Name'):'...'; }},
         { text: 'Project Name',  flex: 1, dataIndex: 'Predecessor', renderer:function(Predecessor){     return Predecessor  && Predecessor.get('Project') ? Predecessor.get('Project').Name:'...'; }},
-        { text: 'Schedule State',  flex: 1, dataIndex: 'Predecessor', renderer:function(Predecessor){     return  Predecessor ? Predecessor.get('ScheduleState'):'...'; }}
+        { text: 'Schedule State',  flex: 1, dataIndex: 'Predecessor', renderer:function(Predecessor){     return  Predecessor ? Predecessor.get('ScheduleState'):'...'; }},
+        {text: 'Release Name', dataIndex: 'Predecessor', renderer:function(Predecessor){    return  Predecessor && Predecessor.get('Release') ? Predecessor.get('Release').Name:'...';}},
+        {text: 'Blocked', dataIndex: 'Predecessor',renderer:function(Predecessor){    return  Predecessor ? Predecessor.get('Blocked') : '...';}}
     );    
 
-    if(me.getSetting('showMoreColumns')){
+    if(me.down('#showMoreColumns').value){
         pre_columns.push(
-            {text: 'Release Name', dataIndex: 'Predecessor', renderer:function(Predecessor){    return  Predecessor && Predecessor.get('Release') ? Predecessor.get('Release').Name:'...';}},
+            {text: 'Feature ID', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Feature') ? Predecessor.get('Feature').FormattedID:'...';}},
+            {text: 'Feature Name', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Feature') ? Predecessor.get('Feature').Name:'...';}},
             {text: 'Release Start Date', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Release') ? Ext.util.Format.date(Predecessor.get('Release').ReleaseStartDate):'...';}},
             {text: 'Release End Date', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Release') ? Ext.util.Format.date(Predecessor.get('Release').ReleaseDate):'...';}},
             {text: 'Iteration Name', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Iteration') ? Predecessor.get('Iteration').Name:'...';}},
             {text: 'Iteration Start Date', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Iteration') ? Ext.util.Format.date(Predecessor.get('Iteration').StartDate): '...';}},
             {text: 'Iteration End Date', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Iteration') ? Ext.util.Format.date(Predecessor.get('Iteration').EndDate) : '...';}},
             {text: 'Owner', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Owner') ? Predecessor.get('Owner').Name : '...';}},
-            {text: 'Blocked', dataIndex: 'Predecessor',renderer:function(Predecessor){    return  Predecessor ? Predecessor.get('Blocked') : '...';}},
             {text: 'Blocked Reason', dataIndex: 'Predecessor',renderer:function(Predecessor){    return  Predecessor ? Predecessor.get('BlockedReason'):'...';}},
             {text: 'Notes', dataIndex: 'Predecessor', renderer:function(Predecessor){    return  Predecessor ? Predecessor.get('Notes'):'...';}}        
         );        
     }
 
-    var story_columns = [];
-
-    story_columns.push({
-                            text: 'Story User ID', 
-                            dataIndex: 'Story',flex: 1, 
-                            renderer:function(Story){
-                                return Story ? Story.get('FormattedID'):'...';
-                            }
-                        },
-                        {
-                            text: 'User Story Name', 
-                            dataIndex: 'Story',
-                            flex: 2,
-                            renderer:function(Story){
-                                return Story ? Story.get('Name') :'...';
-                            }
-                        },
-                        {
-                            text: 'Project Name', 
-                            dataIndex: 'Story',flex: 1, 
-                            //flex: 2,
-                            renderer:function(Story){
-                                return Story && Story.get('Project') ? Story.get('Project').Name : '...';
-                            }
-                        },
-                        {
-                            text: 'Schedule State', 
-                            dataIndex: 'Story',flex: 1, 
-                            //flex: 1,                    
-                            renderer:function(Story){
-                                return Story ? Story.get('ScheduleState'):'...';
-                            }
-                        });
-
-    if(me.getSetting('showMoreColumns')){
-
-        story_columns.push({
-                            text: 'Release Name', 
-                            dataIndex: 'Story',
-                            //flex: 2,
-                            renderer:function(Story){
-                                return Story && Story.get('Release') ? Story.get('Release').Name : '...';
-                            }
-                        },
-                        {
-                            text: 'Release Start Date', 
-                            dataIndex: 'Story',
-                            //flex: 1,                    
-                            renderer:function(Story){
-                                return Story && Story.get('Release') ? Ext.util.Format.date(Story.get('Release').ReleaseStartDate) : '...';
-                            }
-                        },
-                        {
-                            text: 'Release End Date', 
-                            dataIndex: 'Story',
-                            //flex: 1,                    
-                            renderer:function(Story){
-                                return Story && Story.get('Release') ?  Ext.util.Format.date(Story.get('Release').ReleaseDate) : '...';
-                            }
-                        },
-                        {
-                            text: 'Iteration Name', 
-                            dataIndex: 'Story',
-                            //flex: 2,                    
-                            renderer:function(Story){
-                                return Story && Story.get('Iteration') ? Story.get('Iteration').Name : '...';
-                            }
-                        },
-                        {
-                            text: 'Iteration Start Date', 
-                            dataIndex: 'Story',
-                            //flex: 1,                    
-                            renderer:function(Story){
-                                return Story && Story.get('Iteration') ? Ext.util.Format.date(Story.get('Iteration').StartDate) : '...';
-                            }
-                        },
-                        {
-                            text: 'Iteration End Date', 
-                            dataIndex: 'Story',
-                            //flex: 1,                    
-                            renderer:function(Story){
-                                return Story && Story.get('Iteration') ? Ext.util.Format.date(Story.get('Iteration').EndDate) : '...';
-                            }
-                        },
-                        {
-                            text: 'Owner', 
-                            dataIndex: 'Story',
-                            //flex: 1,                    
-                            renderer:function(Story){
-                                return Story && Story.get('Owner') ? Story.get('Owner').Name : '...'
-                            }
-                        },
-                        {
-                            text: 'Blocked', 
-                            dataIndex: 'Story',
-                            //flex: 1,                    
-                            renderer:function(Story){
-                                return Story ? Story.get('Blocked'):'...';
-                            }
-                        },
-                        {
-                            text: 'Blocked Reason', 
-                            dataIndex: 'Story',
-                            //flex: 1,                    
-                            renderer:function(Story){
-                                return Story ? Story.get('BlockedReason'):'...';
-                            }
-                        },
-                        {
-                            text: 'Notes', 
-                            dataIndex: 'Story',
-                            //flex: 2,                    
-                            renderer:function(Story){
-                                return Story ? Story.get('Notes'):'...';
-                            }
-                        });
-    }
 
     var succ_columns = [];
 
@@ -1276,10 +1197,8 @@ Ext.define("TSApp", {
                             renderer:function(Successor){
                                 return Successor ? Successor.get('ScheduleState'):'...';
                             }
-                        });
-
-    if(me.getSetting('showMoreColumns')){
-            succ_columns.push({
+                        },
+                        {
                             text: 'Release Name', 
                             dataIndex: 'Successor',
                             //flex: 2,
@@ -1287,6 +1206,20 @@ Ext.define("TSApp", {
                                 return Successor && Successor.get('Release') ? Successor.get('Release').Name : '...';
                             }
                         },
+                        {
+                            text: 'Blocked', 
+                            dataIndex: 'Successor',
+                            //flex: 1,                    
+                            renderer:function(Successor){
+                                return Successor ? Successor.get('Blocked'):'...';
+                            }
+                        }
+                        );
+
+    if(me.down('#showMoreColumns').value){
+            succ_columns.push(
+                        {text: 'Feature ID', dataIndex: 'Successor',renderer:function(Successor){    return Successor && Successor.get('Feature') ? Successor.get('Feature').FormattedID:'...';}},
+                        {text: 'Feature Name', dataIndex: 'Successor',renderer:function(Successor){    return Successor && Successor.get('Feature') ? Successor.get('Feature').Name:'...';}},
                         {
                             text: 'Release Start Date', 
                             dataIndex: 'Successor',
@@ -1336,14 +1269,6 @@ Ext.define("TSApp", {
                             }
                         },
                         {
-                            text: 'Blocked', 
-                            dataIndex: 'Successor',
-                            //flex: 1,                    
-                            renderer:function(Successor){
-                                return Successor ? Successor.get('Blocked'):'...';
-                            }
-                        },
-                        {
                             text: 'Blocked Reason', 
                             dataIndex: 'Successor',
                             //flex: 1,                    
@@ -1358,7 +1283,8 @@ Ext.define("TSApp", {
                             renderer:function(Successor){
                                 return Successor ? Successor.get('Notes'):'...';
                             }
-                        });
+                        }
+                        );
     }
 
     return [
@@ -1374,18 +1300,18 @@ Ext.define("TSApp", {
                         backgroundColor: '#cccccc'
                     }                    
                 },
-                {
-                    text: 'Stories',
-                    columns: story_columns,
-                    draggable: false, 
-                    hideable: false,
-                    sortable: false,
-                    border:5,
-                    style: {
-                        backgroundColor: '#cccccc'
-                    }     
+                // {
+                //     text: 'Stories',
+                //     columns: story_columns,
+                //     draggable: false, 
+                //     hideable: false,
+                //     sortable: false,
+                //     border:5,
+                //     style: {
+                //         backgroundColor: '#cccccc'
+                //     }     
 
-                },                
+                // },                
                 {
                     text: 'Get (Successors)',
                     columns: succ_columns,
