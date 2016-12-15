@@ -4,7 +4,7 @@ Ext.define("TSApp", {
     logger: new Rally.technicalservices.Logger(),
     defaults: { margin: 10 },
     items: [
-        {xtype:'container',itemId:'selector_box'},
+        {xtype:'container',itemId:'selector_box', layout:'hbox', padding: 10},
         {xtype:'container',itemId:'display_box'}
     ],
 
@@ -67,7 +67,7 @@ Ext.define("TSApp", {
             fieldLabel: '',
             margin:10,
             boxLabel: 'Show More Columns on Grid',
-            checked: true,
+            checked: false,
             listeners: {
                 scope: me,
                 change: function() {
@@ -140,7 +140,6 @@ Ext.define("TSApp", {
                         Deft.Chain.sequence(promises).then({
                             success: function(results){
                                 me.logger.log('_after getCollection >',results);
-
                                 var us_deps = [];
 
                                 for (var i = 0; records && i < records.length; i++) {
@@ -160,23 +159,21 @@ Ext.define("TSApp", {
                                         //     suc = null;
                                         // }
                                         if(pre != null || suc != null){
-                                            // var us_dep = {
-                                            //     Story:records[i],
-                                            //     Predecessor: pre, 
-                                            //     Successor: suc
-                                            // };
-                                            // us_deps.push(us_dep);
+
+
                                             if(pre != null){
+
                                                 var us_dep = {
                                                     Predecessor: pre, 
-                                                    Successor:records[i]
+                                                    Successor:records[i],
                                                 };
                                                 us_deps.push(us_dep);   
                                             }                                            
                                             if(suc != null){
+
                                                 var us_dep = {
                                                     Predecessor:records[i],
-                                                    Successor: suc
+                                                    Successor: suc,
                                                 };   
                                                 us_deps.push(us_dep);
                                             }
@@ -301,6 +298,10 @@ Ext.define("TSApp", {
             store: store,
             showRowActionsColumn: false,
             columnCfgs:me._getColumns()
+            // ,
+            // style: {
+            //      border: '1px solid black'
+            // }
         };
 
         me.down('#display_box').add(grid);
@@ -313,26 +314,35 @@ Ext.define("TSApp", {
     var pre_columns = [];
 
     pre_columns.push(
-        { text: 'Give User Story ID',  flex: 1, dataIndex: 'Predecessor',                            renderer:function(Predecessor,metaData){     return  Predecessor ? Predecessor.get('FormattedID'):'...'; }},
-        { text: 'User Story Name',  flex: 2, dataIndex: 'Predecessor', renderer:function(Predecessor){     return  Predecessor ? Predecessor.get('Name'):'...'; }},
-        { text: 'Project Name',  flex: 1, dataIndex: 'Predecessor', renderer:function(Predecessor){     return Predecessor  && Predecessor.get('Project') ? Predecessor.get('Project').Name:'...'; }},
-        { text: 'Schedule State',  flex: 1, dataIndex: 'Predecessor', renderer:function(Predecessor){     return  Predecessor ? Predecessor.get('ScheduleState'):'...'; }},
-        {text: 'Release Name', dataIndex: 'Predecessor', renderer:function(Predecessor){    return  Predecessor && Predecessor.get('Release') ? Predecessor.get('Release').Name:'...';}},
-        {text: 'Blocked', dataIndex: 'Predecessor',renderer:function(Predecessor){    return  Predecessor ? Predecessor.get('Blocked') : '...';}}
+        { text: 'Give User<br>Story ID',  flex: 1, dataIndex: 'Predecessor',                            renderer:function(Predecessor,metaData){     return  Predecessor ? Predecessor.get('FormattedID'):'...'; }},
+        { text: 'User Story Name',  flex: 3, dataIndex: 'Predecessor', renderer:function(Predecessor){     return  Predecessor ? Predecessor.get('Name'):'...'; }},
+        { text: 'Project Name',  flex: 3, dataIndex: 'Predecessor', renderer:function(Predecessor){     return Predecessor  && Predecessor.get('Project') ? Predecessor.get('Project').Name:'...'; }},
+        { text: 'Schedule<br>State',  flex: 1, dataIndex: 'Predecessor', renderer:function(Predecessor){     return  Predecessor ? Predecessor.get('ScheduleState'):'...'; }},
+        {text: 'Release Name',flex: 2, dataIndex: 'Predecessor', renderer:function(Predecessor){    return  Predecessor && Predecessor.get('Release') ? Predecessor.get('Release').Name:'...';}},
+        {text: 'Blocked', flex: 1,dataIndex: 'Predecessor',renderer:function(Predecessor){    return  Predecessor && Predecessor.get('Blocked') ? 'Yes' : 'No';}},
+        {
+            text: 'In<br>Release?', 
+            dataIndex: 'Predecessor',
+            flex: 1 ,
+            renderer:function(Predecessor){    
+                return  Predecessor && Predecessor.get('Release') && (Predecessor.get('Release').Name == me.release.rawValue) ? "Yes":"No";
+            }          
+        },
+        {text: 'Iteration<br>End Date', flex: 1,dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Iteration') ? Ext.util.Format.date(Predecessor.get('Iteration').EndDate) : '...';}}
+                    
     );    
 
     if(me.down('#showMoreColumns').value){
         pre_columns.push(
-            {text: 'Feature ID', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Feature') ? Predecessor.get('Feature').FormattedID:'...';}},
-            {text: 'Feature Name', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Feature') ? Predecessor.get('Feature').Name:'...';}},
-            {text: 'Release Start Date', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Release') ? Ext.util.Format.date(Predecessor.get('Release').ReleaseStartDate):'...';}},
-            {text: 'Release End Date', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Release') ? Ext.util.Format.date(Predecessor.get('Release').ReleaseDate):'...';}},
-            {text: 'Iteration Name', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Iteration') ? Predecessor.get('Iteration').Name:'...';}},
-            {text: 'Iteration Start Date', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Iteration') ? Ext.util.Format.date(Predecessor.get('Iteration').StartDate): '...';}},
-            {text: 'Iteration End Date', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Iteration') ? Ext.util.Format.date(Predecessor.get('Iteration').EndDate) : '...';}},
-            {text: 'Owner', dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Owner') ? Predecessor.get('Owner').Name : '...';}},
-            {text: 'Blocked Reason', dataIndex: 'Predecessor',renderer:function(Predecessor){    return  Predecessor ? Predecessor.get('BlockedReason'):'...';}},
-            {text: 'Notes', dataIndex: 'Predecessor', renderer:function(Predecessor){    return  Predecessor ? Predecessor.get('Notes'):'...';}}        
+            {text: 'Feature ID', flex: 1,dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Feature') ? Predecessor.get('Feature').FormattedID:'...';}},
+            {text: 'Feature Name',flex: 2, dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Feature') ? Predecessor.get('Feature').Name:'...';}},
+            {text: 'Release Start Date', flex: 1,dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Release') ? Ext.util.Format.date(Predecessor.get('Release').ReleaseStartDate):'...';}},
+            {text: 'Release End Date',flex: 1, dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Release') ? Ext.util.Format.date(Predecessor.get('Release').ReleaseDate):'...';}},
+            {text: 'Iteration Name', flex: 2,dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Iteration') ? Predecessor.get('Iteration').Name:'...';}},
+            {text: 'Iteration Start Date',flex: 1, dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Iteration') ? Ext.util.Format.date(Predecessor.get('Iteration').StartDate): '...';}},
+            {text: 'Owner',flex: 1, dataIndex: 'Predecessor',renderer:function(Predecessor){    return Predecessor && Predecessor.get('Owner') ? Predecessor.get('Owner').Name : '...';}},
+            {text: 'Blocked Reason',flex: 2,dataIndex: 'Predecessor',renderer:function(Predecessor){    return  Predecessor ? Predecessor.get('BlockedReason'):'...';}},
+            {text: 'Notes', flex: 3, dataIndex: 'Predecessor', renderer:function(Predecessor){    return  Predecessor ? Predecessor.get('Notes'):'...';}}        
         );        
     }
 
@@ -340,8 +350,9 @@ Ext.define("TSApp", {
     var succ_columns = [];
 
     succ_columns.push({
-                            text: 'Get User ID', 
-                            dataIndex: 'Successor',flex: 1, 
+                            text: 'Get User<br>Story ID', 
+                            dataIndex: 'Successor',
+                            flex: 1, 
                             renderer:function(Successor){
                                 return Successor ? Successor.get('FormattedID'):'...';
                             }
@@ -349,7 +360,7 @@ Ext.define("TSApp", {
                         {
                             text: 'User Story Name', 
                             dataIndex: 'Successor',flex: 1, 
-                            flex: 2,
+                            flex: 3,
                             renderer:function(Successor){
                                 return Successor ? Successor.get('Name') :'...';
                             }
@@ -357,15 +368,15 @@ Ext.define("TSApp", {
                         {
                             text: 'Project Name', 
                             dataIndex: 'Successor',flex: 1, 
-                            //flex: 2,
+                            flex: 3,
                             renderer:function(Successor){
                                 return Successor && Successor.get('Project') ? Successor.get('Project').Name : '...';
                             }
                         },
                         {
-                            text: 'Schedule State', 
+                            text: 'Schedule<br>State', 
                             dataIndex: 'Successor',flex: 1, 
-                            //flex: 1,                    
+                            flex: 1,                    
                             renderer:function(Successor){
                                 return Successor ? Successor.get('ScheduleState'):'...';
                             }
@@ -373,29 +384,46 @@ Ext.define("TSApp", {
                         {
                             text: 'Release Name', 
                             dataIndex: 'Successor',
-                            //flex: 2,
+                            flex: 2,
                             renderer:function(Successor){
                                 return Successor && Successor.get('Release') ? Successor.get('Release').Name : '...';
                             }
                         },
+
                         {
-                            text: 'Blocked', 
+                            text: 'In<br>Release?', 
                             dataIndex: 'Successor',
-                            //flex: 1,                    
+                            flex: 1 ,
+                            renderer:function(Successor){    
+                                return  Successor && Successor.get('Release') && (Successor.get('Release').Name == me.release.rawValue) ? "Yes":"No";
+                            }          
+                        },
+                        {
+                            text: 'Iteration<br>Start Date', 
+                            dataIndex: 'Successor',
+                            flex: 1,                    
                             renderer:function(Successor){
-                                return Successor ? Successor.get('Blocked'):'...';
+                                return Successor && Successor.get('Iteration') ? Ext.util.Format.date(Successor.get('Iteration').StartDate) : '...';
                             }
-                        }
+                        }                        
                         );
 
     if(me.down('#showMoreColumns').value){
             succ_columns.push(
-                        {text: 'Feature ID', dataIndex: 'Successor',renderer:function(Successor){    return Successor && Successor.get('Feature') ? Successor.get('Feature').FormattedID:'...';}},
+                        {
+                            text: 'Blocked', 
+                            dataIndex: 'Successor',
+                            flex: 1,                    
+                            renderer:function(Successor){
+                                return Successor && Successor.get('Blocked')? 'Yes':'No';
+                            }
+                        },                
+                        {text: 'Feature ID', flex: 1,dataIndex: 'Successor',renderer:function(Successor){    return Successor && Successor.get('Feature') ? Successor.get('Feature').FormattedID:'...';}},
                         {text: 'Feature Name', dataIndex: 'Successor',renderer:function(Successor){    return Successor && Successor.get('Feature') ? Successor.get('Feature').Name:'...';}},
                         {
                             text: 'Release Start Date', 
                             dataIndex: 'Successor',
-                            //flex: 1,                    
+                            flex: 2,                    
                             renderer:function(Successor){
                                 return Successor && Successor.get('Release') ? Ext.util.Format.date(Successor.get('Release').ReleaseStartDate) : '...';
                             }
@@ -403,7 +431,7 @@ Ext.define("TSApp", {
                         {
                             text: 'Release End Date', 
                             dataIndex: 'Successor',
-                            //flex: 1,                    
+                            flex: 1,                    
                             renderer:function(Successor){
                                 return Successor && Successor.get('Release') ?  Ext.util.Format.date(Successor.get('Release').ReleaseDate) : '...';
                             }
@@ -411,23 +439,15 @@ Ext.define("TSApp", {
                         {
                             text: 'Iteration Name', 
                             dataIndex: 'Successor',
-                            //flex: 2,                    
+                            flex: 1,                    
                             renderer:function(Successor){
                                 return Successor && Successor.get('Iteration') ? Successor.get('Iteration').Name : '...';
                             }
                         },
                         {
-                            text: 'Iteration Start Date', 
-                            dataIndex: 'Successor',
-                            //flex: 1,                    
-                            renderer:function(Successor){
-                                return Successor && Successor.get('Iteration') ? Ext.util.Format.date(Successor.get('Iteration').StartDate) : '...';
-                            }
-                        },
-                        {
                             text: 'Iteration End Date', 
                             dataIndex: 'Successor',
-                            //flex: 1,                    
+                            flex: 1,                    
                             renderer:function(Successor){
                                 return Successor && Successor.get('Iteration') ? Ext.util.Format.date(Successor.get('Iteration').EndDate) : '...';
                             }
@@ -435,7 +455,7 @@ Ext.define("TSApp", {
                         {
                             text: 'Owner', 
                             dataIndex: 'Successor',
-                            //flex: 1,                    
+                            flex: 1,                    
                             renderer:function(Successor){
                                 return Successor && Successor.get('Owner') ? Successor.get('Owner').Name : '...'
                             }
@@ -443,7 +463,7 @@ Ext.define("TSApp", {
                         {
                             text: 'Blocked Reason', 
                             dataIndex: 'Successor',
-                            //flex: 1,                    
+                            flex: 2,                    
                             renderer:function(Successor){
                                 return Successor ? Successor.get('BlockedReason'):'...';
                             }
@@ -451,7 +471,7 @@ Ext.define("TSApp", {
                         {
                             text: 'Notes', 
                             dataIndex: 'Successor',
-                            //flex: 2,                    
+                            flex: 3,                    
                             renderer:function(Successor){
                                 return Successor ? Successor.get('Notes'):'...';
                             }
@@ -470,7 +490,8 @@ Ext.define("TSApp", {
                     border:5,
                     style: {
                         backgroundColor: '#cccccc'
-                    }                    
+                    },
+                    flex:1              
                 },
                 // {
                 //     text: 'Stories',
@@ -493,7 +514,8 @@ Ext.define("TSApp", {
                     border:5,
                     style: {
                         backgroundColor: '#cccccc'
-                    }                         
+                    },
+                    flex:1
                 }
                 ];
 
