@@ -11,26 +11,6 @@ Ext.define("TSApp", {
     integrationHeaders : {
         name : "TSApp"
     },
-
-    // config: {
-    //     defaultSettings: {
-    //         showMoreColumns: false
-    //     }
-    // },
-
-    // getSettingsFields: function() {
-    //     var me = this;
-    //     return [{
-    //         name: 'showMoreColumns',
-    //         itemId: 'showMoreColumns',
-    //         xtype: 'rallycheckboxfield',
-    //         boxLabelAlign: 'after',
-    //         fieldLabel: '',
-    //         margin:10,
-    //         boxLabel: 'Show More Columns on Grid',
-    //         checked: true
-    //     }];
-    // },
      
     launch: function() {
         var me = this;
@@ -360,7 +340,7 @@ Ext.define("TSApp", {
                         {
                             text: 'User Story Name', 
                             dataIndex: 'Successor',flex: 1, 
-                            flex: 3,
+                            flex: 4,
                             renderer:function(Successor){
                                 return Successor ? Successor.get('Name') :'...';
                             }
@@ -471,7 +451,7 @@ Ext.define("TSApp", {
                         {
                             text: 'Notes', 
                             dataIndex: 'Successor',
-                            flex: 3,                    
+                            flex: 4,                    
                             renderer:function(Successor){
                                 return Successor ? Successor.get('Notes'):'...';
                             }

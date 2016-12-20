@@ -3,13 +3,13 @@
 <head>
     <title>Dependency Grid by Release</title>
     <!--  (c) 2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Thu Dec 15 2016 10:44:37 GMT-0800 (PST) -->
+    <!--  Build Date: Tue Dec 20 2016 10:26:40 GMT-0800 (PST) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Thu Dec 15 2016 10:44:37 GMT-0800 (PST)";
+        var APP_BUILD_DATE = "Tue Dec 20 2016 10:26:40 GMT-0800 (PST)";
         var STORY    = "US801";
         var BUILDER  = "arajaraman";
-        var CHECKSUM = 46449352726;
+        var CHECKSUM = 45576574789;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -839,26 +839,6 @@ Ext.define("TSApp", {
     integrationHeaders : {
         name : "TSApp"
     },
-
-    // config: {
-    //     defaultSettings: {
-    //         showMoreColumns: false
-    //     }
-    // },
-
-    // getSettingsFields: function() {
-    //     var me = this;
-    //     return [{
-    //         name: 'showMoreColumns',
-    //         itemId: 'showMoreColumns',
-    //         xtype: 'rallycheckboxfield',
-    //         boxLabelAlign: 'after',
-    //         fieldLabel: '',
-    //         margin:10,
-    //         boxLabel: 'Show More Columns on Grid',
-    //         checked: true
-    //     }];
-    // },
      
     launch: function() {
         var me = this;
@@ -1188,7 +1168,7 @@ Ext.define("TSApp", {
                         {
                             text: 'User Story Name', 
                             dataIndex: 'Successor',flex: 1, 
-                            flex: 3,
+                            flex: 4,
                             renderer:function(Successor){
                                 return Successor ? Successor.get('Name') :'...';
                             }
@@ -1299,7 +1279,7 @@ Ext.define("TSApp", {
                         {
                             text: 'Notes', 
                             dataIndex: 'Successor',
-                            flex: 3,                    
+                            flex: 4,                    
                             renderer:function(Successor){
                                 return Successor ? Successor.get('Notes'):'...';
                             }
