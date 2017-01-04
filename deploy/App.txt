@@ -3,13 +3,13 @@
 <head>
     <title>Dependency Grid by Release</title>
     <!--  (c) 2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Tue Jan 03 2017 16:17:13 GMT-0800 (PST) -->
+    <!--  Build Date: Wed Jan 04 2017 11:22:52 GMT-0800 (PST) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Tue Jan 03 2017 16:17:13 GMT-0800 (PST)";
+        var APP_BUILD_DATE = "Wed Jan 04 2017 11:22:52 GMT-0800 (PST)";
         var STORY    = "US801";
         var BUILDER  = "arajaraman";
-        var CHECKSUM = 46183977404;
+        var CHECKSUM = 46273370828;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -806,7 +806,7 @@ Ext.define('Rally.technicalservices.FileUtilities', {
                             display_value = column.renderer(display_value, mock_meta_data, record, 0, 0, store, grid.getView());
                         }
                     }
-                    node_values.push(display_value);
+                    node_values.push(display_value.replace(/"/g, '""'));
                 } else {
                     var display_value = null;
                     if (!column._csvIgnoreRender && column.renderer) {
@@ -815,13 +815,13 @@ Ext.define('Rally.technicalservices.FileUtilities', {
                         } else {
                             display_value = column.renderer(display_value, mock_meta_data, record, record, 0, 0, store, grid.getView());
                         }
-                        node_values.push(display_value);
+                        node_values.push(display_value.replace(/"/g, '""'));
                     }
                 }
 
             }
         }, this);
-        //console.log('Node values',node_values);
+        console.log('Node values',node_values);
         return '"' + node_values.join('","') + '"';
     }
 
