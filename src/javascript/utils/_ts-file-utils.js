@@ -353,7 +353,7 @@ Ext.define('Rally.technicalservices.FileUtilities', {
                             display_value = column.renderer(display_value, mock_meta_data, record, 0, 0, store, grid.getView());
                         }
                     }
-                    node_values.push(display_value.replace(/"/g, '""'));
+                    node_values.push(display_value ? display_value.replace(/"/g, '""') : display_value);
                 } else {
                     var display_value = null;
                     if (!column._csvIgnoreRender && column.renderer) {
@@ -362,7 +362,7 @@ Ext.define('Rally.technicalservices.FileUtilities', {
                         } else {
                             display_value = column.renderer(display_value, mock_meta_data, record, record, 0, 0, store, grid.getView());
                         }
-                        node_values.push(display_value.replace(/"/g, '""'));
+                        node_values.push(display_value ? display_value.replace(/"/g, '""') : display_value);
                     }
                 }
 
