@@ -129,10 +129,10 @@ Ext.define("TSApp", {
                                         console.log('pre,suc',pre,suc);
                                         
                                         //remove duplicates
-                                        var storyRelOID = records[i] && records[i].get('Release') && records[i].get('Release').ObjectID ? records[i].get('Release').ObjectID : null;
-                                        var preRelOID = pre && pre.get('Release') && pre.get('Release').ObjectID ? pre.get('Release').ObjectID : null;
+                                        var storyRelName = records[i] && records[i].get('Release') && records[i].get('Release').Name ? records[i].get('Release').Name : null;
+                                        var preRelOName = pre && pre.get('Release') && pre.get('Release').ObjectID ? pre.get('Release').Name : null;
                                         //var sucRelOID = suc && suc.get('Release') && suc.get('Release').ObjectID ? suc.get('Release').ObjectID : null;
-                                        if(storyRelOID == preRelOID){
+                                        if(storyRelName == preRelOName){
                                             pre = null;
                                         }
                                         // if(storyRelOID == sucRelOID){
@@ -277,6 +277,8 @@ Ext.define("TSApp", {
             xtype: 'rallygrid',
             store: store,
             showRowActionsColumn: false,
+            scroll: true,
+            autoScroll:true,            
             columnCfgs:me._getColumns()
             //,
             // ,

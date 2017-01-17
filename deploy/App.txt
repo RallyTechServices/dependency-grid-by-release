@@ -3,13 +3,13 @@
 <head>
     <title>Dependency Grid by Release</title>
     <!--  (c) 2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Wed Jan 04 2017 11:22:52 GMT-0800 (PST) -->
+    <!--  Build Date: Mon Jan 16 2017 21:37:16 GMT-0800 (PST) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Wed Jan 04 2017 11:22:52 GMT-0800 (PST)";
+        var APP_BUILD_DATE = "Mon Jan 16 2017 21:37:16 GMT-0800 (PST)";
         var STORY    = "US801";
         var BUILDER  = "arajaraman";
-        var CHECKSUM = 46273370828;
+        var CHECKSUM = 46523223766;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -806,7 +806,7 @@ Ext.define('Rally.technicalservices.FileUtilities', {
                             display_value = column.renderer(display_value, mock_meta_data, record, 0, 0, store, grid.getView());
                         }
                     }
-                    node_values.push(display_value.replace(/"/g, '""'));
+                    node_values.push(display_value ? display_value.replace(/"/g, '""') : display_value);
                 } else {
                     var display_value = null;
                     if (!column._csvIgnoreRender && column.renderer) {
@@ -815,7 +815,7 @@ Ext.define('Rally.technicalservices.FileUtilities', {
                         } else {
                             display_value = column.renderer(display_value, mock_meta_data, record, record, 0, 0, store, grid.getView());
                         }
-                        node_values.push(display_value.replace(/"/g, '""'));
+                        node_values.push(display_value ? display_value.replace(/"/g, '""') : display_value);
                     }
                 }
 
@@ -957,10 +957,10 @@ Ext.define("TSApp", {
                                         console.log('pre,suc',pre,suc);
                                         
                                         //remove duplicates
-                                        var storyRelOID = records[i] && records[i].get('Release') && records[i].get('Release').ObjectID ? records[i].get('Release').ObjectID : null;
-                                        var preRelOID = pre && pre.get('Release') && pre.get('Release').ObjectID ? pre.get('Release').ObjectID : null;
+                                        var storyRelName = records[i] && records[i].get('Release') && records[i].get('Release').Name ? records[i].get('Release').Name : null;
+                                        var preRelOName = pre && pre.get('Release') && pre.get('Release').ObjectID ? pre.get('Release').Name : null;
                                         //var sucRelOID = suc && suc.get('Release') && suc.get('Release').ObjectID ? suc.get('Release').ObjectID : null;
-                                        if(storyRelOID == preRelOID){
+                                        if(storyRelName == preRelOName){
                                             pre = null;
                                         }
                                         // if(storyRelOID == sucRelOID){
@@ -1105,6 +1105,8 @@ Ext.define("TSApp", {
             xtype: 'rallygrid',
             store: store,
             showRowActionsColumn: false,
+            scroll: true,
+            autoScroll:true,            
             columnCfgs:me._getColumns()
             //,
             // ,
