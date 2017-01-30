@@ -255,7 +255,8 @@ Ext.define("TSApp", {
         Ext.create('Rally.data.wsapi.Store', {
             model: model_name,
             fetch: model_fields,
-            filters: model_filters
+            filters: model_filters,
+            limit: 'Infinity'
         }).load({
             callback : function(records, operation, successful) {
                 if (successful){

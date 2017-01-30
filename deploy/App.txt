@@ -3,13 +3,13 @@
 <head>
     <title>Dependency Grid by Release</title>
     <!--  (c) 2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Mon Jan 16 2017 21:37:16 GMT-0800 (PST) -->
+    <!--  Build Date: Mon Jan 30 2017 11:29:46 GMT-0800 (PST) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Mon Jan 16 2017 21:37:16 GMT-0800 (PST)";
+        var APP_BUILD_DATE = "Mon Jan 30 2017 11:29:47 GMT-0800 (PST)";
         var STORY    = "US801";
         var BUILDER  = "arajaraman";
-        var CHECKSUM = 46523223766;
+        var CHECKSUM = 46572446623;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -1083,7 +1083,8 @@ Ext.define("TSApp", {
         Ext.create('Rally.data.wsapi.Store', {
             model: model_name,
             fetch: model_fields,
-            filters: model_filters
+            filters: model_filters,
+            limit: 'Infinity'
         }).load({
             callback : function(records, operation, successful) {
                 if (successful){
